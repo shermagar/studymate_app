@@ -16,6 +16,11 @@ ios/Flutter/flutter_export_environment.sh
 windows/flutter/ephemeral/
 linux/flutter/ephemeral/
 macos/Flutter/ephemeral/
+# Ignored platform runners
+linux/
+macos/
+windows/
+.metadata
 
 # IDE files
 .idea/
