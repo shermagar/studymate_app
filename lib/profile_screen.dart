@@ -62,7 +62,6 @@ class ProfileScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
@@ -72,11 +71,18 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        leading: Icon(icon, color: const Color(0xFFFF5C00)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-        onTap: () {},
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        child: ListTile(
+          leading: Icon(icon, color: const Color(0xFFFF5C00)),
+          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+          trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          onTap: () {},
+        ),
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'main_scaffold.dart';
+import 'study_session_screen.dart';
 import 'rescue_command_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,7 +18,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               'Welcome back 👋',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 13, color: Colors.grey),
             ),
             Text(
               'Dashboard',
@@ -42,7 +44,7 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // 1. Progress / Status Card
+          // Overdue Banner
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -63,48 +65,57 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '3 Overdue Tasks',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                // 1. Wrap the Column in Expanded so it flexes to fit any screen width
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '3 Overdue Tasks',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Immediate action required',
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RescueCommandScreen(),
+                      SizedBox(height: 4),
+                      Text(
+                        'Immediate action required',
+                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFFFF5C00),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    ],
                   ),
-                  child: const Text('Resolve', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
+                const SizedBox(width: 12),
+
+                // 2. Resolve button
+                ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const RescueCommandScreen(),
+      ),
+    );
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    foregroundColor: const Color(0xFFFF5C00),
+    elevation: 0,
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  child: const Text('Resolve', style: TextStyle(fontWeight: FontWeight.bold)),
+)
               ],
             ),
           ),
           const SizedBox(height: 24),
 
-          // 2. Quick Actions
+          // Quick Actions
           const Text(
             'Quick Actions',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -112,41 +123,58 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
+              // 1. Rescue Mode Card
               _buildActionCard(
                 icon: Icons.bolt,
                 label: 'Rescue Mode',
-                color: Colors.orange.shade100,
-                iconColor: Colors.deepOrange,
+                bgColor: const Color(0xFFFFF1E6),
+                iconColor: const Color(0xFFFF5C00),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RescueCommandScreen(),
+                  MainScaffold.of(context)?.switchTab(1);
+                },
+              ),
+              const SizedBox(width: 12),
+
+              // 2. Add Task Card
+              _buildActionCard(
+                icon: Icons.assignment_turned_in_outlined,
+                label: 'Add Task',
+                bgColor: const Color(0xFFE8F2FF),
+                iconColor: const Color(0xFF2563EB),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Add Task dialog coming next!'),
+                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                 },
               ),
               const SizedBox(width: 12),
-              _buildActionCard(
-                icon: Icons.add_task,
-                label: 'Add Task',
-                color: Colors.blue.shade50,
-                iconColor: Colors.blue,
-                onTap: () {},
-              ),
-              const SizedBox(width: 12),
+
+              // 3. Study Timer Card -> Navigates directly to StudySessionScreen
               _buildActionCard(
                 icon: Icons.timer_outlined,
                 label: 'Study Timer',
-                color: Colors.green.shade50,
-                iconColor: Colors.green,
-                onTap: () {},
+                bgColor: const Color(0xFFE8F9EE),
+                iconColor: const Color(0xFF10B981),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const StudySessionScreen(
+                        taskTitle: 'ICT725 Assessment',
+                        initialMinutes: 30,
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
           const SizedBox(height: 28),
 
-          // 3. Upcoming Deadlines Preview
+          // Urgent Priorities
           const Text(
             'Urgent Priorities',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -162,7 +190,7 @@ class HomeScreen extends StatelessWidget {
   static Widget _buildActionCard({
     required IconData icon,
     required String label,
-    required Color color,
+    required Color bgColor,
     required Color iconColor,
     required VoidCallback onTap,
   }) {
@@ -186,14 +214,15 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               CircleAvatar(
-                backgroundColor: color,
+                backgroundColor: bgColor,
                 radius: 22,
                 child: Icon(icon, color: iconColor, size: 22),
               ),
               const SizedBox(height: 8),
               Text(
                 label,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -220,10 +249,7 @@ class HomeScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-          ),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
